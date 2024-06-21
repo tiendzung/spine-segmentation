@@ -53,7 +53,7 @@ class SpiderDataset(Dataset):
         else:
             # Add for debugging
             path = os.path.join(self.data_dir, self.data[index]["image"])
-            output["image"] = [path, path] ##[path, path, path, path] ##Set to 4 because the model_inferr in validation_step
+            output["image"] = path ##Set to 4 because the model_inferr in validation_step
         output["label"] = os.path.join(self.data_dir, self.data[index]["label"])
         return output
     
@@ -93,7 +93,7 @@ class SpiderTransformedDataset(Dataset):
         return len(self.dataset)
 
 if __name__=="__main__":
-    dataset = SpiderDataset(data_dir = "./data/dataset/spine_nii", json_path="./data/jsons/spine_v3.json")
+    dataset = SpiderDataset(data_dir = "/Users/tiendzung/Downloads/spine_nii", json_path="./data/jsons/spine_v3.json")
     # dataset = SpiderDataset(data_dir = "./data/dataset", json_path="/data/hpc/spine/jsons/brats21_folds.json")
     
     transform = monai.transforms.Compose([monai.transforms.LoadImaged(keys=["image", "label"], image_only = False),
@@ -104,7 +104,7 @@ if __name__=="__main__":
     
     transformed = SpiderTransformedDataset(dataset, transform)
     data = dataset[0]
-    images = transformed[12]
+    images = transformed[10]
     print(data)
     print(images["image"].size(), images["image"].dtype)
     print(images["label"].size(), images["label"].dtype)

@@ -7,6 +7,10 @@ transforms:
   - _target_: src.data.transforms.array.ConvertToMultiChannelBasedOnSpiderClassesdSemantic
     keys: label
   
+  - _target_: monai.transforms.EnsureChannelFirstd
+    keys: image
+    channel_dim: no_channel
+  
   - _target_: monai.transforms.Resized
     keys: [image, label]
     spatial_size: [32, 420, 420]

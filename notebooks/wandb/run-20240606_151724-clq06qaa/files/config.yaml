@@ -1,0 +1,95 @@
+wandb_version: 1
+
+_wandb:
+  desc: null
+  value:
+    python_version: 3.10.14
+    cli_version: 0.17.0
+    framework: torch
+    is_jupyter_run: true
+    is_kaggle_kernel: false
+    start_time: 1717661844
+    t:
+      1:
+      - 1
+      - 41
+      - 48
+      - 55
+      2:
+      - 1
+      - 41
+      - 48
+      - 55
+      3:
+      - 19
+      - 23
+      4: 3.10.14
+      5: 0.17.0
+      8:
+      - 1
+      - 4
+      - 5
+      13: darwin-arm64
+seed:
+  desc: null
+  value: 0
+roi_size:
+  desc: null
+  value:
+  - 224
+  - 224
+  - 144
+batch_size:
+  desc: null
+  value: 1
+num_workers:
+  desc: null
+  value: 4
+max_train_images_visualized:
+  desc: null
+  value: 3
+max_val_images_visualized:
+  desc: null
+  value: 3
+dice_loss_smoothen_numerator:
+  desc: null
+  value: 0
+dice_loss_smoothen_denominator:
+  desc: null
+  value: 1.0e-05
+dice_loss_squared_prediction:
+  desc: null
+  value: true
+dice_loss_target_onehot:
+  desc: null
+  value: false
+dice_loss_apply_sigmoid:
+  desc: null
+  value: true
+initial_learning_rate:
+  desc: null
+  value: 0.0001
+weight_decay:
+  desc: null
+  value: 1.0e-05
+max_train_epochs:
+  desc: null
+  value: 50
+validation_intervals:
+  desc: null
+  value: 1
+dataset_dir:
+  desc: null
+  value: ./dataset/
+checkpoint_dir:
+  desc: null
+  value: ./checkpoints
+inference_roi_size:
+  desc: null
+  value:
+  - 128
+  - 128
+  - 64
+max_prediction_images_visualized:
+  desc: null
+  value: 20

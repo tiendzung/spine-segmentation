@@ -48,3 +48,5 @@ python src/train.py trainer.max_epochs=20 data.batch_size=64
 ## Experiment
 
 https://wandb.ai/tiendung050803/Spine
+![alt text](image-1.png)
+![alt text](image.png)

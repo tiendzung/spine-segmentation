@@ -2,6 +2,8 @@ from typing import Optional, List
 import monai
 import monai.transforms
 import SimpleITK as sitk
+import monai.transforms.utility
+import monai.transforms.utility.dictionary
 import numpy as np 
 import torch
 from lightning import LightningDataModule
@@ -13,6 +15,7 @@ import rootutils
 
 rootutils.setup_root(search_from=__file__, indicator="setup.py", pythonpath=True)
 from src.data.transforms import array
+from src.data.transforms import utils
 
 # always starting with vanilla dataset, like its a norm to me now
 class SpiderDataset(Dataset):
@@ -53,7 +56,7 @@ class SpiderDataset(Dataset):
         else:
             # Add for debugging
             path = os.path.join(self.data_dir, self.data[index]["image"])
-            output["image"] = path ##Set to 4 because the model_inferr in validation_step
+            output["image"] = [path] ##[path, path] ##[path, path, path, path] ##Set to 4 because the model_inferr in validation_step
         output["label"] = os.path.join(self.data_dir, self.data[index]["label"])
         return output
     
@@ -73,7 +76,6 @@ class SpiderDataset(Dataset):
         return len(self.data)
     
     
-
 class SpiderTransformedDataset(Dataset):
     def __init__(self, 
                  dataset: SpiderDataset,
@@ -84,8 +86,8 @@ class SpiderTransformedDataset(Dataset):
     
     def __getitem__(self, index):
         transformed = self.transform(self.dataset[index])
-        if transformed["image"].ndim == 3:
-            transformed["image"] = transformed["image"].unsqueeze(0)
+        # if transformed["image"].ndim == 3:
+        #     transformed["image"] = transformed["image"].unsqueeze(0)
 
         return transformed
     
@@ -93,18 +95,42 @@ class SpiderTransformedDataset(Dataset):
         return len(self.dataset)
 
 if __name__=="__main__":
-    dataset = SpiderDataset(data_dir = "/Users/tiendzung/Downloads/spine_nii", json_path="./data/jsons/spine_v3.json")
-    # dataset = SpiderDataset(data_dir = "./data/dataset", json_path="/data/hpc/spine/jsons/brats21_folds.json")
+    dataset = SpiderDataset(data_dir = "/data/hpc/spine/dataset/spine_nii", json_path="/data/hpc/spine/jsons/spine_v3.json")
+    # dataset = SpiderDataset(data_dir = "./data/dataset", json_path="/data/hpc/spine/jsons/brats21_folds_one.json")
     
     transform = monai.transforms.Compose([monai.transforms.LoadImaged(keys=["image", "label"], image_only = False),
                                           array.ConvertToMultiChannelBasedOnSpiderClassesdSemantic(keys=["label"]),
+                                          monai.transforms.EnsureChannelFirstd(keys="image", channel_dim='no_channel'),
+                                          monai.transforms.Spacingd(keys=["image", "label"], pixdim=[1.75, 0.625, 0.58742571], mode=(3, "nearest")),
                                         #   monai.transforms.ConvertToMultiChannelBasedOnBratsClassesd(keys=["label"]),
                                         #   monai.transforms.Resized(keys=["image", "label"], spatial_size=(250, 250, 155)),
                                           monai.transforms.ToTensord(keys=["image", "label"]),])
     
+    # transform = transforms.Compose(
+    #     [
+    #         monai.transforms.LoadImaged(keys=["image", "label"], image_only=False),
+    #         monai.transforms.ConvertToMultiChannelBasedOnBratsClassesd(keys="label"),
+    #         # utils.AddChanneld(keys=["image"]),
+    #         monai.transforms.EnsureChannelFirstd(keys="image", channel_dim='no_channel'),
+    #         monai.transforms.CropForegroundd(
+    #             keys=["image", "label"], source_key="image", k_divisible=[96, 96, 96]
+    #         ),
+    #         monai.transforms.RandSpatialCropd(
+    #             keys=["image", "label"], roi_size=[96, 96, 96], random_size=False
+    #         ),
+    #         monai.transforms.RandFlipd(keys=["image", "label"], prob=0.5, spatial_axis=0),
+    #         monai.transforms.RandFlipd(keys=["image", "label"], prob=0.5, spatial_axis=1),
+    #         monai.transforms.RandFlipd(keys=["image", "label"], prob=0.5, spatial_axis=2),
+    #         monai.transforms.NormalizeIntensityd(keys="image", nonzero=True, channel_wise=True),
+    #         monai.transforms.RandScaleIntensityd(keys="image", factors=0.1, prob=1.0),
+    #         monai.transforms.RandShiftIntensityd(keys="image", offsets=0.1, prob=1.0),
+    #         monai.transforms.ToTensord(keys=["image", "label"]),
+    #     ]
+    # )
+
     transformed = SpiderTransformedDataset(dataset, transform)
     data = dataset[0]
-    images = transformed[10]
+    images = transformed[12]
     print(data)
     print(images["image"].size(), images["image"].dtype)
     print(images["label"].size(), images["label"].dtype)
@@ -113,6 +139,10 @@ if __name__=="__main__":
     print(images['image_meta_dict'])
     print("------------------")
     print(images['label_meta_dict'])
+    config = images['label_meta_dict']
+    with open("/work/hpc/spine-segmentation/data/config.json", "w") as f:
+        f.write(str(config))
+
     print(images["label"].size())
     
     # res = 0

@@ -1,7 +1,7 @@
 _target_: src.app.infer.Inferer
 
 exp_name: Brats21_Test
-checkpoint_path: /work/hpc/spine-segmentation/logs/train/runs/2024-04-04_15-08-49/checkpoints/last.ckpt
+checkpoint_path: /work/hpc/spine-segmentation/logs/train/runs/brats/checkpoints/last.ckpt
 
 data_name: BraTS2021
 

@@ -195,7 +195,7 @@ class SpiderLitModule(LightningModule):
         else:
             data, target = batch["image"], batch["label"]
         # print(data.size())
-        data, target = data.cuda(0), target.cuda(0) #??? vl fix cứng ----> export cuda_visible_devices rồi nên không quan trọng
+        data, target = data, target
             
         for param in self.net.parameters():
             param.grad = None
@@ -299,7 +299,9 @@ class SpiderLitModule(LightningModule):
             data, target = batch["image"], batch["label"]
             # data = torch.cat((data,data), dim=1)
             # print(data.size())
-            data, target = data.cuda(0), target.cuda(0)
+
+            # data, target = data.cuda(0), target.cuda(0)
+            # self.net.cuda(0)
             with autocast(enabled=False):
                 logits = self.model_inferer(data) ## why does it require [b, 4, w, h, d]?????
             val_labels_list = decollate_batch(target) ## Optimal to use decollate_batch, we can choose to use it or not
@@ -342,8 +344,9 @@ class SpiderLitModule(LightningModule):
                 self.log(self.name[i], self.val_acc.avg[i], on_step=False, on_epoch=True, prog_bar=True)
 
         # return run_acc.avg
-        return {'loss': loss} ##, 'Dice_TC': Dice_TC, 'Dice_WT': Dice_WT, 'Dice_ET': Dice_ET}
-
+        return {'loss': loss, 'pred': val_output_convert, 'target': target}
+    
+    @torch.no_grad()
     def on_validation_epoch_start(self) -> None:
         self.net.eval()
         # self.val_loss.reset()
@@ -358,11 +361,11 @@ class SpiderLitModule(LightningModule):
         # # otherwise metric would be reset by lightning after each epoch
         # self.log("val/acc_best", self.val_acc_best.compute(), sync_dist=True, prog_bar=True)
         val_acc = self.val_acc.avg
-        semantic_classes = ["Dice_Val_TC", "Dice_Val_WT", "Dice_Val_ET"]
+        # semantic_classes = ["Dice_Val_TC", "Dice_Val_WT", "Dice_Val_ET"]
             
-        Dice_TC = val_acc[0]
-        Dice_WT = val_acc[1]
-        Dice_ET = val_acc[2]
+        # Dice_TC = val_acc[0]
+        # Dice_WT = val_acc[1]
+        # Dice_ET = val_acc[2]
 
         val_avg_acc = np.mean(val_acc)
         self.log("val/acc", val_avg_acc, sync_dist=True, prog_bar=True, logger=False) ##Mean Val Dice
@@ -374,6 +377,7 @@ class SpiderLitModule(LightningModule):
         # print(val_avg_acc)
         
 
+    @torch.no_grad()
     def test_step(self, batch: Tuple[torch.Tensor, torch.Tensor], batch_idx: int) -> None:
         """Perform a single test step on a batch of data from the test set.
 

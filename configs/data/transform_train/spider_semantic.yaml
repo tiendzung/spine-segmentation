@@ -10,11 +10,11 @@ transforms:
 
   - _target_: monai.transforms.EnsureChannelFirstd
     keys: image
-    channel_dim: no_channel
+    # channel_dim: no_channel
 
   - _target_: monai.transforms.Spacingd
     keys: [image, label]
-    pixdim:  [1.75, 0.625, 0.58742571] ##${data.spider.spacing}
+    pixdim:  [1.7, 0.625, 0.58742571] ##${data.spider.spacing}
     mode: 3
 
   # - _target_: monai.transforms.Resized
@@ -28,7 +28,7 @@ transforms:
 
   - _target_: monai.transforms.RandSpatialCropd
     keys: [image, label]
-    roi_size: [32, 192, 192]
+    roi_size: [32, 192, 192] 
     random_size: False
 
   - _target_: monai.transforms.RandFlipd

@@ -56,7 +56,7 @@ class SpiderDataset(Dataset):
         else:
             # Add for debugging
             path = os.path.join(self.data_dir, self.data[index]["image"])
-            output["image"] = [path] ##[path, path] ##[path, path, path, path] ##Set to 4 because the model_inferr in validation_step
+            output["image"] = [path] ##, path, path, path]
         output["label"] = os.path.join(self.data_dir, self.data[index]["label"])
         return output
     

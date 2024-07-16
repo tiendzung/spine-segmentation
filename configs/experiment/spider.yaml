@@ -23,8 +23,8 @@ data:
 
 trainer:
   min_epochs: 1
-  max_epochs: 20
-  precision: 16 ##16-mixed ## reduce memory usage but may reduce accuracy
+  max_epochs: 10
+  # precision: 16 ##16-mixed ## reduce memory usage but may reduce accuracy
 #   gradient_clip_val: 0.5
 
 model:
@@ -38,7 +38,7 @@ model:
   #   lr: 0.002
   net:
     in_channels: 1
-    feature_size: 24
+    feature_size: 36
 
 
 

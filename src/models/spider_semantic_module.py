@@ -94,7 +94,7 @@ class SpiderLitModule(LightningModule):
         infer_overlap = 0.5,
         # amp = False,
     ) -> None:
-        """Initialize a `Brast21LitModule`.
+        """Initialize a `SpiderLitModule`.
 
         :param net: The model to train.
         :param optimizer: The optimizer to use for training.
@@ -319,7 +319,7 @@ class SpiderLitModule(LightningModule):
             self.dice_acc(y_pred=val_output_convert, y=val_labels_list)
             # print(self.dice_acc(y_pred=val_output_convert, y=val_labels_list))
             acc, not_nans = self.dice_acc.aggregate()
-            acc = acc.cuda(0)
+            acc = acc.cuda()
             # print("+++++++++")
             # print(acc)
 
@@ -349,7 +349,7 @@ class SpiderLitModule(LightningModule):
     @torch.no_grad()
     def on_validation_epoch_start(self) -> None:
         self.net.eval()
-        # self.val_loss.reset()
+        self.val_loss.reset()
         self.val_acc.reset()
     
     @torch.no_grad()
@@ -368,6 +368,8 @@ class SpiderLitModule(LightningModule):
         # Dice_ET = val_acc[2]
 
         val_avg_acc = np.mean(val_acc)
+
+        print(f"{val_acc}, Mean: {val_avg_acc}")
         self.log("val/acc", val_avg_acc, sync_dist=True, prog_bar=True, logger=False) ##Mean Val Dice
         
         if val_avg_acc > self.val_acc_max:
@@ -385,7 +387,35 @@ class SpiderLitModule(LightningModule):
             labels.
         :param batch_idx: The index of the current batch.
         """
-        pass
+        with torch.no_grad():
+            # for idx, batch in enumerate(loader):
+            data, target = batch["image"], batch["label"]
+            # data = torch.cat((data,data), dim=1)
+            # print(data.size())
+
+            # data, target = data.cuda(0), target.cuda(0)
+            # self.net.cuda(0)
+            with autocast(enabled=False):
+                logits = self.model_inferer(data) ## logits shape = [B, in_channel, D, W, H]
+            test_labels_list = decollate_batch(target) ## Optimal to use decollate_batch, we can choose to use it or not
+            test_outputs_list = decollate_batch(logits) ## Optimal to use decollate_batch, we can choose to use it or not
+            
+            test_output_convert = [self.post_pred(self.post_sigmoid(test_pred_tensor)) for test_pred_tensor in test_outputs_list]
+          
+            self.dice_acc.reset()
+            self.dice_acc(y_pred=test_output_convert, y=test_labels_list)
+            # print(self.dice_acc(y_pred=val_output_convert, y=val_labels_list))
+            acc, not_nans = self.dice_acc.aggregate()
+            acc = acc.cuda()
+
+            loss = self.criterion(logits, target)
+            # self.val_loss.update(loss, data.size(0))
+            self.log("test/loss", loss, on_step=False, on_epoch=True, prog_bar=True)
+
+            # self.val_acc.update(acc.cpu().numpy(), n=not_nans.cpu().numpy())
+
+        return {'loss': loss, 'pred': test_output_convert, 'target': target}
+
     
     def on_test_epoch_start(self) -> None:
         pass

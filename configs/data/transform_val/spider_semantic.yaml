@@ -9,7 +9,7 @@ transforms:
 
   - _target_: monai.transforms.EnsureChannelFirstd
     keys: image
-    channel_dim: no_channel
+    # channel_dim: no_channel
   
   - _target_: monai.transforms.Spacingd
     keys: [image, label]

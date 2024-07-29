@@ -236,7 +236,7 @@ class WandbCallback(Callback):
         
             # To save the segmentation volume
             transform = monai.transforms.Resize(spatial_size=[original_size[0], original_size[1], original_size[2]])
-            seg = transform(prob[i])
+            seg = transform(prob[i]) > 0.5
             label = transform(labels[i]) > 0.5
             image = transform(images[i])
 

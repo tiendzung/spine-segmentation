@@ -339,9 +339,10 @@ class SpiderLitModule(LightningModule):
 
             # print("Val Dice: Mean: {:.6g}, TC: {:.6f}, WT: {:.6f}, ET: {:.6f}".format(np.mean(self.val_acc.avg), Dice_TC, Dice_WT, Dice_ET))
 
-
+            print(self.val_acc.avg)
+            print(not_nans)
             for i in range(3):
-                self.log(self.name[i], self.val_acc.avg[i], on_step=False, on_epoch=True, prog_bar=True)
+                self.log(self.name[i], self.val_acc.sum[i], on_step=False, on_epoch=True, prog_bar=True) ##val_acc.avg[i]
 
         # return run_acc.avg
         return {'loss': loss, 'pred': val_output_convert, 'target': target}

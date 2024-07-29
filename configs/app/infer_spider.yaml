@@ -1,7 +1,7 @@
 _target_: src.app.infer_spider.Inferer
 
 exp_name: Spider_Test
-checkpoint_path: /work/hpc/spine-segmentation/logs/train/runs/test_delete/semantic_old_version.ckpt
+checkpoint_path: /work/hpc/spine-segmentation/logs/train/runs/192-36-v2/checkpoints/epoch_253.ckpt ##/work/hpc/spine-segmentation/logs/train/runs/test_delete/semantic_old_version.ckpt
 data_name: Spider
 
 data_loader:

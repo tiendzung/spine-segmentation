@@ -45,7 +45,8 @@ class Inferer(object):
         self.net = net
         model = SpiderLitModule.load_from_checkpoint(checkpoint_path=checkpoint_path)
         self.model_inferer = partial(model_inferer, predictor=model)
-      
+        
+
     def feed(self):
         with torch.no_grad():
             for i, batch in enumerate(self.data_loader):

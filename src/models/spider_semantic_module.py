@@ -342,7 +342,7 @@ class SpiderLitModule(LightningModule):
             print(self.val_acc.avg)
             print(not_nans)
             for i in range(3):
-                self.log(self.name[i], self.val_acc.sum[i], on_step=False, on_epoch=True, prog_bar=True) ##val_acc.avg[i]
+                self.log(self.name[i], self.val_acc.val[i], on_step=False, on_epoch=True, prog_bar=True) ##val_acc.avg[i]
 
         # return run_acc.avg
         return {'loss': loss, 'pred': val_output_convert, 'target': target}

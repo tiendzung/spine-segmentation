@@ -37,5 +37,5 @@ class Canal(Component):
 
         topo = lbc.extract_topology()
         return topo
-uguguu
+
     

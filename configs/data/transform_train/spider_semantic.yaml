@@ -28,7 +28,7 @@ transforms:
 
   - _target_: monai.transforms.RandSpatialCropd
     keys: [image, label]
-    roi_size: [32, 192, 192] 
+    roi_size: [32, 256, 256] 
     random_size: False
 
   - _target_: monai.transforms.RandFlipd
